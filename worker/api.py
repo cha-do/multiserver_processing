@@ -1,44 +1,34 @@
 from fastapi import FastAPI
-import requests
 import sys
-import settings
+from network import NetworkManager 
+network  =NetworkManager()
+# subscribe_to_server,send_results
 app = FastAPI()
 
 
 
-def get_lan_ip():
-    import socket
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-
-    ip =  s.getsockname()[0].strip()
-    s.close()
-    return ip
-
-
-def subscribe_to_server(server_ip):
-    params = {
-        'ip': f"{get_lan_ip()}:{settings.PORT}",
-    }
-    print(f"suscribing to server {server_ip} with the params {params}")
-
-    url = f'http://{server_ip}/subscribe/'
-    response = requests.post(url, params=params)
-    if  response.status_code != 200 or response.json()['status'] != 'success':
-        raise Exception("Whe couldn't connect to server")
-    print(f"Connected to server on ip {server_ip} ")
 
 @app.get("/")
 async def get_workers():
     return {'hi':'worker running'}
 
 import time
+from threading import Thread
+import requests
+from random import randint
+def run_task_logic(id,name,parameters):
+    print(f"hi we are running the next task {id} {name}, with parameters {parameters}")
+    time.sleep(3)
+    print(f"process done.")
+    print(parameters)
+    network.send_results(id,results={"result":sum(parameters["parameters"]["numbers"])})
+    network.subscribe_to_server(sys.argv[1])
+
 @app.post("/")
 async def run_task(id:str,name:str,parameters:dict):
-    print(f"hi we are running the next task {id} {name}, with parameters {parameters}")
-    time.sleep(20)
-    print(f"process done.")
 
+    t = Thread(target=run_task_logic,args=(id,name,parameters))
+    t.start()
     return {'status':'success'}
 
-subscribe_to_server(sys.argv[1])
+network.subscribe_to_server(sys.argv[1])
