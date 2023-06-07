@@ -34,8 +34,8 @@ async def get_tasks():
     return workers.all_tasks
 
 @app.post("/complete_task/")
-async def complete_task(id:str,results:dict):
-    return workers.complete_task(id,results)
+async def complete_task(id:str,status:str,results:dict):
+    return workers.complete_task(id,status,results)
 
 
 

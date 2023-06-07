@@ -32,7 +32,14 @@ class NetworkManager:
             raise Exception("Whe couldn't connect to server")
         print(f"Connected to server on ip {self.server_ip} ")
 
-    def send_results(self,id,results):
+    def send_results(self,id,results,status="success"):
+        print("sending results to server = ",results)
+        print(type(results))
         url_responses = os.path.join(self.server_ip,"complete_task")
-        r = requests.post(url_responses,params={"id":id},json=results)
-        print("sending results to server = ",r.json())
+        # print("sending results to server = ",results)
+
+        r = requests.post(url_responses,params={"id":id,"status":status},json=results)
+        print("server response = ",r.json())
+
+   
+network  =NetworkManager()

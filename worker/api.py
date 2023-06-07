@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 import sys
-from network import NetworkManager 
-network  =NetworkManager()
+from network import network
+import logic
+import settings
+from threading import Thread
+
 # subscribe_to_server,send_results
 app = FastAPI()
 
@@ -12,23 +15,48 @@ app = FastAPI()
 async def get_workers():
     return {'hi':'worker running'}
 
-import time
-from threading import Thread
-import requests
-from random import randint
-def run_task_logic(id,name,parameters):
-    print(f"hi we are running the next task {id} {name}, with parameters {parameters}")
-    time.sleep(3)
-    print(f"process done.")
-    print(parameters)
-    network.send_results(id,results={"result":sum(parameters["parameters"]["numbers"])})
-    network.subscribe_to_server(sys.argv[1])
 
 @app.post("/")
 async def run_task(id:str,name:str,parameters:dict):
+    resolver_class = getattr(logic, settings.DEFAULT_RESOLVER)
+    resolver_obj = resolver_class()
+    settings.tasks.append(resolver_obj)
 
-    t = Thread(target=run_task_logic,args=(id,name,parameters))
+    t = Thread(target=resolver_obj.run,args=(id,name,parameters))
     t.start()
     return {'status':'success'}
 
+@app.get("/validate_task")
+async def validate_task(id:str):
+    for task in settings.tasks:
+        if task.task_id == id:
+            return task.status
+    return {"status": "failed","message":"task not found"}
+
+@app.get("/all_tasks")
+async def all_task():
+    return settings.tasks
+
+
+@app.get("/health_check")
+async def health_check(task_id:str):
+    alive = False
+    for task in settings.tasks:
+        if task.task_id == task_id:
+            print("task status: ",task.status)
+            alive = task.status != "failed"
+    print("check alive: ",alive)
+    return {"alive":alive}
+
+
+health_check
 network.subscribe_to_server(sys.argv[1])
+
+
+
+
+def run():
+
+    return 1/0
+
+
