@@ -1,6 +1,6 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
-import workers
+import worker2 as workers
 
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -47,3 +47,6 @@ async def runtask(id:str,name:str,parameters:dict):
     response = workers.run_task(id=id,name=name,parameters=parameters)
 
     return response
+
+input("PRESS ENTER TO STOP THE PROGRAM.\n")
+workers.stop_threads()

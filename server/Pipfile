@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 uvicorn = "*"
 requests = "*"
+fastapi = "*"
+aiohttp = "*"
 
 [dev-packages]
 

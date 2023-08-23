@@ -1,11 +1,12 @@
 import requests
 import queue
-from threading import Thread
+from threading import Thread, Event
 import sys
 
 workers = queue.Queue()
 tasks = queue.Queue()
 all_tasks =  {}
+stop_event = Event()
 def add_worker(w_ip):
     full_ip = f"http://{w_ip}"
     # TODO regex ip validation
@@ -30,7 +31,7 @@ def complete_task(id,status,results):
 def main_process_tasks():
     print('Consumer: Running')
     # consume work
-    while True:
+    while not stop_event.is_set():
         # get a unit of work
         task_id = tasks.get()
         name = all_tasks[task_id]['name']
@@ -59,7 +60,7 @@ from time import sleep
 def health_checker():
     print('Health Checker: Running')
     # consume work
-    while True:
+    while not stop_event.is_set():
         print('Health Checker: Checking...')
 
         pending_task = ((task_id,task) for task_id,task in all_tasks.items() if task['status'] == 'assigned')
@@ -88,6 +89,15 @@ health = Thread(target=health_checker)
 health.start()
 print("health checker started")
 
+def stop_threads():
+    # Set the stop event to signal threads to stop
+    stop_event.set()
 
+    # Wait for threads to finish
+    consumer.join()
+    health.join()
+    print("Main process done")
+
+    
 
 # consumer.join()

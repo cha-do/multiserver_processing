@@ -5,7 +5,9 @@ name = "pypi"
 
 [packages]
 fastapi = "*"
-pandas = "*"
+python-dotenv = "*"
+requests = "*"
+uvicorn = "*"
 
 [dev-packages]
 
