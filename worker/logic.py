@@ -1,5 +1,3 @@
-
-
 import time
 from network import network 
 import sys
@@ -29,12 +27,12 @@ class CalculatorTaskResolver(TaskResolver):
     def __init__(self) -> None:
         self.functions = {
             'sum': lambda parameters:sum(parameters["numbers"]),
-            'divide': lambda parameters:parameters["a"]/parameters["parameters"]["b"],
-            'multiply': lambda parameters:parameters["a"]*parameters["parameters"]["b"],
-            'subtract': lambda parameters: parameters["a"]-parameters["parameters"]["b"]
+            'divide': lambda parameters:parameters["a"]/parameters["b"],
+            'multiply': lambda parameters:parameters["a"]*parameters["b"],
+            'subtract': lambda parameters: parameters["a"]-parameters["b"]
         }
     def _run(self,name,parameters):
-        print(f"hi we are running the next task {self.task_id} {name}, with parameters {parameters}")
+        print(f"Hi we are running the next task {self.task_id} {name}, with parameters {parameters}")
         time.sleep(20)
         if name in self.functions:
             print(parameters)
@@ -45,6 +43,6 @@ class CalculatorTaskResolver(TaskResolver):
         
 class MetaauristicasTaskResolver(TaskResolver):
     
-    def __run(self,id,name,parameters):
+    def _run(self,id,name,parameters):
         pass
 

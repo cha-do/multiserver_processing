@@ -14,6 +14,15 @@ tasks = [
             }
     }
 ]
+##Task example
+# tasks.put_nowait(1)
+    # all_tasks[1]={
+    #     "name":"sum",
+    #     "parameters":{
+    #         "numbers":[4,2,3]
+    #         },
+    #     'status' : "pending"
+    # }
 
 
 # import custom_multiprocessing

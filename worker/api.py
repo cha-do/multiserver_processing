@@ -8,19 +8,22 @@ from threading import Thread
 # subscribe_to_server,send_results
 app = FastAPI()
 
-
-
-
 @app.get("/")
 async def get_workers():
     return {'hi':'worker running'}
-
 
 @app.post("/")
 async def run_task(id:str,name:str,parameters:dict):
     resolver_class = getattr(logic, settings.DEFAULT_RESOLVER)
     resolver_obj = resolver_class()
-    settings.tasks.append(resolver_obj)
+    passtask = False
+    for i in range(len(settings.tasks)):
+        if settings.tasks[i].task_id == id:
+            settings.tasks[i] = resolver_obj
+            passtask = True
+            break
+    if not passtask:
+        settings.tasks.append(resolver_obj)
 
     t = Thread(target=resolver_obj.run,args=(id,name,parameters))
     t.start()
@@ -43,20 +46,15 @@ async def health_check(task_id:str):
     alive = False
     for task in settings.tasks:
         if task.task_id == task_id:
-            print("task status: ",task.status)
+            print(f"task {task_id} status: {task.status}")
             alive = task.status != "failed"
+            break
     print("check alive: ",alive)
     return {"alive":alive}
 
-
-health_check
 network.subscribe_to_server(sys.argv[1])
 
-
-
-
 def run():
-
-    return 1/0
+    return 1#/0
 
 
