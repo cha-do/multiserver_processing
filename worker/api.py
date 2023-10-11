@@ -17,9 +17,9 @@ async def run_task(id:str,name:str,parameters:dict):
     resolver_class = getattr(logic, settings.DEFAULT_RESOLVER)
     resolver_obj = resolver_class()
     passtask = False
-    for i in range(len(settings.tasks)):
-        if settings.tasks[i].task_id == id:
-            settings.tasks[i] = resolver_obj
+    for task in settings.tasks:
+        if task.task_id == id:
+            task = resolver_obj
             passtask = True
             break
     if not passtask:
@@ -27,7 +27,7 @@ async def run_task(id:str,name:str,parameters:dict):
 
     t = Thread(target=resolver_obj.run,args=(id,name,parameters))
     t.start()
-    return {'status':'success'}
+    return {'status':'assigned'}
 
 @app.get("/validate_task")
 async def validate_task(id:str):

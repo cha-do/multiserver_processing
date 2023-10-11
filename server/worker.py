@@ -2,15 +2,15 @@ import asyncio
 import aiohttp
 import os
 import logging
-from threading import Thread
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class TaskManager:
-    def __init__(self):
+    def __init__(self, db):
         self.all_tasks = {}
         self.stop_event = asyncio.Event()
+        self.db = db
 
     def add_worker(self, w_ip):
         full_ip = f"http://{w_ip}"
@@ -94,17 +94,9 @@ class TaskManager:
         self.worker_queue = asyncio.Queue()
         await asyncio.gather(self.health_checker(), self.main_process_tasks())
 
-# Create an instance of TaskManager
-task_manager = TaskManager()
 
-# Run the asyncio loop in a separate thread
-logger.info("Starting new thread with asyncio loop")
-thread = Thread(target=task_manager.run_asyncio_loop)
-thread.start()
-logger.info("Asyncio loop thread started")
-
-def stop_server():
+#def stop_server():
     # Wait for asyncio loop thread to finish
-    task_manager.stop_event.set()
-    #thread.join()
-    logger.info("Main process done")
+    # task_manager.stop_event.set()
+    # #thread.join()
+    # logger.info("Main process done")
